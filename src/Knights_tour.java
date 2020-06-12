@@ -128,7 +128,7 @@ public class Knights_tour {
 	public static boolean solve_knights_tour(int curr_big, int curr_little, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics) {
 		
 		try {
-			Thread.sleep(75);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
