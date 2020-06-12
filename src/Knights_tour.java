@@ -1,4 +1,3 @@
-import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -93,13 +92,45 @@ public class Knights_tour {
 			}
 		}
 		
+		String ans = "";
+		boolean watch = true;
+		
+		while (true) {
+			System.out.print("Would you like to watch it get solved? > ");
+			ans = input.nextLine();
+			
+			
+			try {
+				ans = ans.toLowerCase();
+				
+				if (ans.equals("yes") || ans.equals("no")) {
+					break;
+				}
+				
+			} catch (NumberFormatException e) {
+				System.out.println();
+				continue;
+			}
+		}
+		
+		if (ans.equals("yes")) {
+			watch = true;
+		} else {
+			watch = false;
+		}
+		
 		//graphics.fill_a_square(start);
 		
-		start_knights_tour(start, squares, graphics);
+		start_knights_tour(start, squares, graphics, watch);
 
 	}
 	
-	static void start_knights_tour(int start_point, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics) {
+	static void start_knights_tour(int start_point, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics, boolean simulate) {
+		
+		//Keeps track of order of path
+		ArrayList<Integer> finish_order = new ArrayList<>();
+		boolean watch = simulate;
+		
 		int curr_big = 0;
 		int curr_little = 0;
 
@@ -113,8 +144,9 @@ public class Knights_tour {
 			}
 		}
 		
-		if (solve_knights_tour(curr_big, curr_little, square_array, graphics)) {
-			graphics.solve_it();
+		if (solve_knights_tour(curr_big, curr_little, square_array, graphics, finish_order, watch)) {
+			graphics.solve_it(finish_order, watch);
+			
 		} else {
 			graphics.fail();
 		}
@@ -125,17 +157,23 @@ public class Knights_tour {
 	}
 	
 	//Big means outer array, small means inner array
-	public static boolean solve_knights_tour(int curr_big, int curr_little, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics) {
+	public static boolean solve_knights_tour(int curr_big, int curr_little, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics, ArrayList<Integer> order, boolean watch) {
 		
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		int sleep_time = 100;
+		
+		if (watch) {
+			try {
+				Thread.sleep(sleep_time);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		
+		ArrayList<int[]> move_order = new ArrayList<>();
+		int possible_moves = 0;
 		
-		boolean solved = false;
 		int little_size = square_array.get(0).size();
 		int big_size = square_array.size();
 		
@@ -143,19 +181,21 @@ public class Knights_tour {
 		int new_little = 0;
 		
 		int fill_id = square_array.get(curr_big).get(curr_little).get_id();
-		graphics.fill_a_square(fill_id);
 		square_array.get(curr_big).get(curr_little).fill();
+		order.add(fill_id);
 		
-		
+		if (watch) {
+			graphics.fill_a_square(fill_id);
+		}
 		
 		//First square to try
 		new_big = curr_big - 2;
 		new_little = curr_little - 1;
 		if (new_big >= 0 && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -164,9 +204,9 @@ public class Knights_tour {
 		new_little = curr_little + 1;
 		if (new_big >= 0 && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -175,10 +215,9 @@ public class Knights_tour {
 		new_little = curr_little + 2;
 		if (new_big >= 0 && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
-			
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -187,9 +226,9 @@ public class Knights_tour {
 		new_little = curr_little + 2;
 		if (new_big < big_size && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -198,9 +237,9 @@ public class Knights_tour {
 		new_little = curr_little + 1;
 		if (new_big < big_size && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -209,9 +248,9 @@ public class Knights_tour {
 		new_little = curr_little - 1;
 		if (new_big < big_size && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -220,9 +259,9 @@ public class Knights_tour {
 		new_little = curr_little - 2;
 		if (new_big < big_size && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
-			}
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
 			
 		}
 		
@@ -231,9 +270,61 @@ public class Knights_tour {
 		new_little = curr_little - 2;
 		if (new_big >= 0 && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
 			
-			if (solve_knights_tour(new_big, new_little, square_array, graphics)) {
-				return true;
+			possible_moves = get_total_moves(new_big, new_little, square_array);
+			int[] move = {possible_moves, square_array.get(new_big).get(new_little).get_id()};
+			move_order.add(move);
+			
+		}
+		
+		//Order the move list
+		for (int i = 0; i < move_order.size(); i += 1) {
+			
+			int[] smallest = move_order.get(i);
+			int smallest_index = i;
+			
+			for (int j = i; j < move_order.size(); j += 1) {
+				if (move_order.get(j)[0] <= smallest[0]) {
+					smallest = move_order.get(j);
+					smallest_index = j;
+				}
 			}
+			
+			move_order.set(smallest_index, move_order.get(i));
+			move_order.set(i, smallest);
+			
+		}
+		
+		//Loop to try the moves in order
+		boolean found = false;
+		for (int i = 0; i < move_order.size(); i += 1) {
+			
+			//get indexes for the next move based off id
+			for (int j = 0; j < square_array.size(); j += 1) {
+				
+				for (int k = 0; k < square_array.get(i).size(); k += 1) {
+					
+					if (square_array.get(j).get(k).get_id() == move_order.get(i)[1]) {
+						found = true;
+						new_big = j;
+						new_little = k;
+						break;
+					}
+				}
+				
+				if (found) {
+					break;
+				}
+			}
+			
+			//if statement to run the recursive function and return true if true
+			if (new_big >= 0 && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
+				
+				if (solve_knights_tour(new_big, new_little, square_array, graphics, order, watch)) {
+					return true;
+				}
+				
+			}
+			
 			
 		}
 		
@@ -242,10 +333,98 @@ public class Knights_tour {
 			return true;
 		}
 		
-		graphics.unfill_a_square(fill_id);
+		if (watch) {
+			graphics.unfill_a_square(fill_id);
+		}
+			
 		square_array.get(curr_big).get(curr_little).unfill();
+		order.remove(order.size() - 1);
 		
 		return false;
+	}
+	
+	static int get_total_moves(int curr_big, int curr_little, ArrayList<ArrayList<Knights_square>> square_array) {
+		int moves = 0;
+		
+		int new_big = 0;
+		int new_little = 0;
+		
+		int little_size = square_array.get(0).size();
+		int big_size = square_array.size();
+		
+		//First square to try
+		new_big = curr_big - 2;
+		new_little = curr_little - 1;
+		if (new_big >= 0 && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Second square
+		new_big = curr_big - 2;
+		new_little = curr_little + 1;
+		if (new_big >= 0 && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Third square
+		new_big = curr_big - 1;
+		new_little = curr_little + 2;
+		if (new_big >= 0 && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Fourth square
+		new_big = curr_big + 1;
+		new_little = curr_little + 2;
+		if (new_big < big_size && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Fifth square
+		new_big = curr_big + 2;
+		new_little = curr_little + 1;
+		if (new_big < big_size && new_little < little_size && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Sixth square
+		new_big = curr_big + 2;
+		new_little = curr_little - 1;
+		if (new_big < big_size && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Seventh square
+		new_big = curr_big + 1;
+		new_little = curr_little - 2;
+		if (new_big < big_size && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		//Eighth square
+		new_big = curr_big - 1;
+		new_little = curr_little - 2;
+		if (new_big >= 0 && new_little >= 0 && square_array.get(new_big).get(new_little).is_open()) {
+			
+			moves += 1;
+			
+		}
+		
+		return moves;
 	}
 	
 	static boolean is_solved(ArrayList<ArrayList<Knights_square>> squares) {

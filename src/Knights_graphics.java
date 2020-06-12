@@ -42,8 +42,8 @@ public class Knights_graphics {
 		frame.unfill_a_square(id);
 	}
 	
-	public void solve_it() {
-		frame.solve_it();
+	public void solve_it(ArrayList<Integer> order, boolean watch) {
+		frame.solve_it(order, watch);
 	}
 	
 	public void fail() {
@@ -74,9 +74,8 @@ class Knights_frame extends JFrame {
 		repaint();
 	}
 	
-	public void solve_it() {
-		canvas.solve_it();
-		repaint();
+	public void solve_it(ArrayList<Integer> order, boolean watch) {
+		canvas.solve_it(order, watch);
 	}
 	
 	public void fail() {
@@ -91,8 +90,7 @@ class Knights_canvas extends JPanel {
 	ArrayList<Knights_square> squares = new ArrayList<>();
 	
 	
-	Knights_canvas() {
-	}
+	Knights_canvas() {}
 	
 	public void create_squares(int total_squares, int box_side) {
 		int side_length = (int) Math.sqrt(total_squares);
@@ -142,15 +140,37 @@ class Knights_canvas extends JPanel {
 		}
 	}
 	
-	public void solve_it() {
-		for (Knights_square square: squares) {
-			square.solve();
+	public void solve_it(ArrayList<Integer> order, boolean watch) {
+		int sleep_time;
+		
+		if (watch) {
+			sleep_time = 10;
+		} else {
+			sleep_time = 100;
 		}
+		
+		for (int i = 0; i < order.size(); i += 1) {
+			
+			try {
+				Thread.sleep(sleep_time);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			int index = order.get(i) - 1;
+			squares.get(index).solve();
+			repaint();
+			
+		}
+		
+		
 	}
 	
 	public void fail() {
 		for (Knights_square square: squares) {
-			square.fill();
+			square.fail();
 		}
 		
 	}
@@ -164,6 +184,11 @@ class Knights_canvas extends JPanel {
 			
 			if (square.solved()) {
 				square.solved_square(g);
+				continue;
+			}
+			
+			if (square.failed()) {
+				square.fail_square(g);
 				continue;
 			}
 			
@@ -189,6 +214,7 @@ class Knights_square {
 	boolean filled = false;
 	boolean solved = false;
 	boolean open = true;
+	boolean failed = false;
 	
 	Knights_square(int x, int y, int size, int square_id) {
 		x_origin = x;
@@ -213,7 +239,7 @@ class Knights_square {
 		g.drawString(str_id, x_origin + (square_size / 2), y_origin + (square_size / 2));
 	}
 	
-	//Draw a red square
+	//Draw a blue square
 	public void fill_square(Graphics g) {
 		g.setColor(Color.blue);
 		g.fillRect(x_origin, y_origin, square_size, square_size);
@@ -243,6 +269,21 @@ class Knights_square {
 		g.drawString(str_id, x_origin + (square_size / 2), y_origin + (square_size / 2));
 	}
 	
+	//Draw a red square
+		public void fail_square(Graphics g) {
+			g.setColor(Color.red);
+			g.fillRect(x_origin, y_origin, square_size, square_size);
+			
+			//Outline the square
+			g.setColor(Color.black);
+			g.drawRect(x_origin, y_origin, square_size, square_size);
+			
+			Font font = new Font("Courier New", Font.BOLD, square_size / 4);
+			g.setFont(font);
+			g.setColor(Color.black);
+			g.drawString(str_id, x_origin + (square_size / 2), y_origin + (square_size / 2));
+		}
+	
 	public void fill() {
 		filled = true;
 		open = false;
@@ -265,13 +306,20 @@ class Knights_square {
 		solved = true;
 	} 
 	
+	public void fail() {
+		failed = true;
+	}
+	
 	public boolean solved() {
 		return solved;
+	}
+	
+	public boolean failed() {
+		return failed;
 	}
 	
 	public boolean is_open() {
 		return open;
 	}
-	
 	 
 }
