@@ -159,7 +159,8 @@ public class Knights_tour {
 	//Big means outer array, small means inner array
 	public static boolean solve_knights_tour(int curr_big, int curr_little, ArrayList<ArrayList<Knights_square>> square_array, Knights_graphics graphics, ArrayList<Integer> order, boolean watch) {
 		
-		int sleep_time = 100;
+		int sleep_time = 10;
+		
 		
 		if (watch) {
 			try {
@@ -170,6 +171,7 @@ public class Knights_tour {
 			}
 			
 		}
+		
 		
 		ArrayList<int[]> move_order = new ArrayList<>();
 		int possible_moves = 0;

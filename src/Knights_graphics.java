@@ -146,7 +146,7 @@ class Knights_canvas extends JPanel {
 		if (watch) {
 			sleep_time = 10;
 		} else {
-			sleep_time = 100;
+			sleep_time = 50;
 		}
 		
 		for (int i = 0; i < order.size(); i += 1) {
