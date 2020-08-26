@@ -32,7 +32,7 @@ public class Knights_graphics {
 		
 		frame.create_squares(square_count, square_side);
 		
-	}
+	}  
 	
 	public void fill_a_square(int id) {
 		frame.fill_a_square(id);
