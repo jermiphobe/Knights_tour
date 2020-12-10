@@ -26,6 +26,7 @@ public class Knights_graphics {
 		//Initializes the frame 'settings'
 		frame.setTitle("Knight's Tour");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setAlwaysOnTop(true);
 		frame.setSize(size + 16, size + 39);
 		frame.setVisible(true);
 		frame.setLocation(400, 100);

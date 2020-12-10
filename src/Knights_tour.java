@@ -18,7 +18,11 @@ public class Knights_tour {
 			
 			try {
 				total_boxes = Integer.parseInt(num_boxes);
-				break;
+				if (total_boxes > 1500) {
+					continue;
+				} else {
+					break;
+				}
 				
 			} catch (NumberFormatException e) {
 				System.out.println();
@@ -37,38 +41,6 @@ public class Knights_tour {
 		System.out.println("Total boxes: " + total_boxes);
 		System.out.println("Side length: " + side_length);
 		System.out.println("Square size: " + square_size);
-		
-		Knights_graphics graphics = new Knights_graphics(total_window_size, square_size, total_boxes);
-		
-		//Create the array for logic side of program
-		int curr_square = 1;
-		int curr_x = 0;
-		int curr_y = 0;
-		
-		//Creates the square objects
-		for (int i = 0; i < side_length; i += 1) {
-			ArrayList<Knights_square> temp_squares = new ArrayList<>();
-			
-			for (int j = 0; j < side_length; j += 1) {
-				
-				Knights_square square = new Knights_square(curr_x, curr_y, side_length, curr_square);
-				temp_squares.add(square);
-				
-				//Increment curr_square 
-				curr_square += 1;
-				
-				//Increment curr_x
-				curr_x += side_length;
-			}
-			
-			squares.add(temp_squares);
-			
-			//Add side length to the curr_y
-			curr_y += side_length;
-			
-			//Reset curr_x
-			curr_x = 0;
-		}
 		
 		//Get the starting point
 		int start = 0;
@@ -117,6 +89,38 @@ public class Knights_tour {
 			watch = true;
 		} else {
 			watch = false;
+		}
+		
+		Knights_graphics graphics = new Knights_graphics(total_window_size, square_size, total_boxes);
+		
+		//Create the array for logic side of program
+		int curr_square = 1;
+		int curr_x = 0;
+		int curr_y = 0;
+		
+		//Creates the square objects
+		for (int i = 0; i < side_length; i += 1) {
+			ArrayList<Knights_square> temp_squares = new ArrayList<>();
+			
+			for (int j = 0; j < side_length; j += 1) {
+				
+				Knights_square square = new Knights_square(curr_x, curr_y, side_length, curr_square);
+				temp_squares.add(square);
+				
+				//Increment curr_square 
+				curr_square += 1;
+				
+				//Increment curr_x
+				curr_x += side_length;
+			}
+			
+			squares.add(temp_squares);
+			
+			//Add side length to the curr_y
+			curr_y += side_length;
+			
+			//Reset curr_x
+			curr_x = 0;
 		}
 		
 		//graphics.fill_a_square(start);
