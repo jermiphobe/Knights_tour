@@ -55,6 +55,7 @@ class Knights_square {
 		g.setFont(font);
 		g.setColor(Color.black);
 		g.drawString(str_id, x_origin + (square_size / 2), y_origin + (square_size / 2));
+		
 	}
 	
 	//Draw a green square
