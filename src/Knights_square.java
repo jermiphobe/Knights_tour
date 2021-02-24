@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 class Knights_square {
 	int x_origin = 0;
@@ -18,6 +19,9 @@ class Knights_square {
 	Color fail = new Color(255, 0, 56);
 	Color working = new Color(33, 171, 205);
 	Color blank = new Color(242, 243, 244);
+	
+	//List of next possible moves
+	ArrayList<Knights_square> move_set = new ArrayList<>();
 	
 	Knights_square(int x, int y, int size, int square_id) {
 		x_origin = x;
