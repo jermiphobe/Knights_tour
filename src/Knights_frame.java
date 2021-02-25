@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFrame;
@@ -26,31 +25,24 @@ class Knights_frame extends JFrame {
 	
 	//List and variables for simulation
 	ArrayList<ArrayList<Knights_square>> squares = new ArrayList<>();
-	ArrayList<ArrayList<Knights_square>> path = new ArrayList<>();
+	ArrayList<Knights_square> path = new ArrayList<>();
+	ArrayList<int[]> legal_moves = new ArrayList<>();
 	
 	//Starting Point
-	int start = 7;
+	int start = 38;
 	
 	//Watch it get solved or not
-	boolean watch = true;
-	int solve_wait = 250;
-	int watch_wait = 500;
+	int watch_wait = 90;
+	
+	//Optimized or not 
+	boolean opt = true;
+	
+	//Solved or not
+	boolean solved = false;
 	
 	//Timer and timer task for doing one iteration of the solution process
     Timer timer;
-    TimerTask simulate = new TimerTask() { 
-
-        public void run() 
-        { 
-            //Need to figure out and track possible moves (only if not visited yet) -> order the moves based on optimization if optimization is enabled
-        	
-        	//Check if anymore legal moves left
-        	
-        	//If not remove this square from the list of moves done
-        	
-        	//Check for solved -> if solved cancel the timer and start the timer to draw in the solution
-        }; 
-    }; 
+    TimerTask simulate;
 	
 	Knights_frame() {
 		
@@ -70,6 +62,9 @@ class Knights_frame extends JFrame {
 		add_menu();
 		add_board();
 		
+		generate_legal_moves();
+		initialize_start();
+		
 		setVisible(true);
 
 	}
@@ -84,9 +79,12 @@ class Knights_frame extends JFrame {
 	}
 	
 	public void add_board() {
+		create_squares();
+		
 		board = new Knights_canvas(height);
 		board.setPreferredSize(new Dimension(height, height));
-		board.create_squares(side_length, menu_width, square_size);
+		board.create_squares(squares);
+		
 		add(board, BorderLayout.CENTER);
 	}
 	
@@ -99,7 +97,17 @@ class Knights_frame extends JFrame {
 		start_btn.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)
 		    {
+		    	if (solved) {
+		    		solved = false;
+		    		squares = new ArrayList<>();
+		    		path = new ArrayList<>();
+		    		
+		    		initialize_start();
+		    	}
+		    		
 		    	start_knights_tour();
+		    	
+		    	
 		    }
 		});
 		
@@ -107,17 +115,181 @@ class Knights_frame extends JFrame {
 	}
 	
 	public void start_knights_tour() {
+		//Creates and runs the timer
 		timer = new Timer();
+		simulate = new TimerTask() { 
+
+	        public void run() 
+	        {   
+	        	
+		        //Need to figure out and track possible moves (only if not visited yet)
+	        	Knights_square current_stop = path.get(path.size() -1);
+	        	if (current_stop.is_open()) {
+	        		get_move_set(current_stop.get_id());
+	        		
+	        		//Sort move set if optimized
+	        		if (opt) {
+	        			current_stop.order_moves();
+	        		}
+	        	
+	        		board.fill_a_square(current_stop.get_id());
+	        		
+	        	}
+	        	
+	        	//If more moves exist, add next move to path and remove from current stop move list
+	        	if (current_stop.more_moves()) {
+	        		int next_id = current_stop.get_next(opt);
+	        		
+	        		//Loop through to find square based on id
+	        		for (int i = 0; i < squares.size(); i += 1) {
+	        			for (int j = 0; j < squares.get(i).size(); j += 1) {
+	        				Knights_square temp = squares.get(i).get(j);
+	        				if (temp.get_id() == next_id) {
+	        					
+	        					path.add(temp);
+	        				}
+	        			}
+	        		}
+	        		
+	        	} else {
+	        		//If no more moves, remove this square from the path list
+	        		path.remove(path.size() -1);
+	        		board.unfill_a_square(current_stop.get_id());
+	        		
+	        	}
+	        	
+	        	//Check for solved -> if solved cancel the timer and start the timer to draw in the solution
+	        	if (path.size() == total_boxes) {  //If the path is the same size as the total amount of squares, then it's solved
+	        		System.out.println("Solved");
+	        		solved = true;
+	        		
+	        		//Fill in the last square with the working color
+	        		int last_id = path.get(path.size() - 1).get_id();
+	        		board.end(last_id);
+	        		timer.cancel();
+	        			        		
+	        	}
+		        	
+	        }; 
+	        
+	    }; 
+	    
+		timer.schedule(simulate, 10, watch_wait);
+
+	}
+	
+	//Sets the starting point
+	public void initialize_start() {
 		
-		if (watch) {
-			timer.schedule(simulate, 10, watch_wait);
-		} else {
-			timer.schedule(simulate, 10, 0);
+		//Finds the starting point and adds it to the path list
+		for (int i = 0; i < squares.size(); i += 1) {
+			for (int j = 0; j < squares.get(i).size(); j += 1) {
+				Knights_square temp = squares.get(i).get(j);
+				if (temp.get_id() == start) {
+					
+					path.add(temp);
+					board.start(start);
+				}
+			}
 		}
 	}
 	
+	//Makes a list of moves and the count of moves from there
 	public void get_move_set(int id) {
-		ArrayList<int[]> legal_moves = new ArrayList<>();
+		//Get the indexes of the current square
+		Knights_square curr = path.get(path.size() -1);
+		int x = curr.get_x_loc();
+		int y = curr.get_y_loc();
+		
+		int temp_count = get_move_count(x, y);
+		
+		for (int[] move: legal_moves) {
+			//Get the square that corresponds to the move
+			int new_x = x + move[0];
+			int new_y = y + move[1];
+			
+			try {
+				Knights_square tmp = squares.get(new_x).get(new_y);
+				
+				if (tmp.is_open()) {
+					int tmp_id = tmp.get_id();				
+					int next_count = get_move_count(new_x, new_y);
+					curr.add_to_future_moves(tmp.get_id(), next_count);
+				}
+				
+			} catch (Exception e) {
+				continue;
+			}
+			
+		}
+		
+		//curr.test_iterate();
+		
+	}
+	
+	//Counts possible moves from a given index
+	public int get_move_count(int x, int y) {
+		int count = 0;
+		
+		for (int[] move: legal_moves) {
+			//Try to access each new location.  If it doesn't error, increment count
+			try {
+				Knights_square temp = squares.get(x + move[0]).get(y + move[1]);
+				if (!temp.filled()) {
+					count += 1;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+			
+		}
+		
+		return count;
+	}
+	
+	public void create_squares() {
+		//Create the array for logic side of program
+		int curr_square = 1;
+		int curr_x = 0;
+		int curr_y = 0;
+				
+		//Creates the square objects
+		for (int i = 0; i < side_length; i += 1) {
+			ArrayList<Knights_square> temp_squares = new ArrayList<>();
+			
+			for (int j = 0; j < side_length; j += 1) {
+				
+				Knights_square square = new Knights_square(curr_x, curr_y, square_size, curr_square, i, j);
+				temp_squares.add(square);
+				
+				//Increment curr_square 
+				curr_square += 1;
+				
+				//Increment curr_x
+				curr_x += square_size;
+			}
+			
+			squares.add(temp_squares);
+			
+			//Add side length to the curr_y
+			curr_y += square_size;
+			
+			//Reset curr_x
+				curr_x = 0;
+			}
+}
+	
+	//A list of legal moves you can make 
+	public void generate_legal_moves() {
+		legal_moves.add(new int[]{-2, -1});
+		legal_moves.add(new int[]{-2, 1});
+		legal_moves.add(new int[]{-1, -2});
+		legal_moves.add(new int[]{-1, 2});
+		legal_moves.add(new int[]{1, -2});
+		legal_moves.add(new int[]{1, 2});
+		legal_moves.add(new int[]{2, -1});
+		legal_moves.add(new int[]{2, 1});
+		
 	}
 		
 	
