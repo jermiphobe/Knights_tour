@@ -23,7 +23,7 @@ class Knights_square {
 	boolean end = false;
 	
 	Color success = new Color(76, 187, 23);
-	Color fail = new Color(255, 0, 56);
+	Color fail = new Color(205,92,92); //(255, 0, 56);
 	Color working = new Color(33, 171, 205);
 	Color blank = new Color(242, 243, 244);
 	Color first = new Color(218, 165, 32);

@@ -16,7 +16,7 @@ class Knights_frame extends JFrame {
 	
 	//Size variables
 	int menu_width = 300;
-	int total_boxes = 64;
+	int total_boxes = 81;
 	int height = 1000;
 	
 	//Figure out side length and box size
@@ -29,7 +29,7 @@ class Knights_frame extends JFrame {
 	ArrayList<int[]> legal_moves = new ArrayList<>();
 	
 	//Starting Point
-	int start = 38;
+	int start = 17;
 	
 	//Watch it get solved or not
 	int watch_wait = 90;
@@ -152,6 +152,12 @@ class Knights_frame extends JFrame {
 	        		}
 	        		
 	        	} else {
+	        		//Check if the board failed
+	        		if (path.size() == 1) {
+	        			board.fail();
+	        			timer.cancel();
+	        		}
+	        		
 	        		//If no more moves, remove this square from the path list
 	        		path.remove(path.size() -1);
 	        		board.unfill_a_square(current_stop.get_id());
@@ -166,6 +172,7 @@ class Knights_frame extends JFrame {
 	        		//Fill in the last square with the working color
 	        		int last_id = path.get(path.size() - 1).get_id();
 	        		board.end(last_id);
+	        		board.solve_it_at_once();
 	        		timer.cancel();
 	        			        		
 	        	}
