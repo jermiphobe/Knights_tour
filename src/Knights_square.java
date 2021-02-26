@@ -32,6 +32,7 @@ class Knights_square {
 	//List of next possible moves
 	ArrayList<ArrayList<Integer>> future_moves = new ArrayList<>();
 	
+	//Constructor 
 	Knights_square(int x, int y, int size, int square_id, int x_loc, int y_loc) {
 		x_origin = x;
 		y_origin = y;
@@ -41,6 +42,53 @@ class Knights_square {
 		id = square_id;
 		str_id = String.valueOf(id);
 		
+	}
+	
+	//This will add a list of a square and it's possible moves to the array of possible moves this square can make
+	public void add_to_future_moves(int id, int total_moves) {
+		ArrayList<Integer> temp_move = new ArrayList<>();
+		temp_move.add(id);
+		temp_move.add(total_moves);
+		future_moves.add(temp_move);
+	}
+	
+	//Checks if there are moves left in the future moves array
+	public boolean more_moves() {
+		if (future_moves.size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	//Returns and removes the next move in the future moves array
+	public int get_next(boolean optimized) {
+		int id = future_moves.get(0).get(0);
+		future_moves.remove(0);
+		return id;
+		
+	}
+	
+	//Sorts the future moves from least possible next moves to most
+	public void order_moves() {
+		for (int i = 0; i < future_moves.size(); i += 1) {
+			ArrayList<Integer> curr_smallest = future_moves.get(i);
+			int smallest = i;
+			
+			for (int j = i; j < future_moves.size(); j += 1) {
+				ArrayList<Integer> curr_checking = future_moves.get(j);
+				
+				if (curr_checking.get(1) < curr_smallest.get(1)) {
+					curr_smallest = curr_checking;
+					smallest = j;
+				}
+				
+			}
+			
+			//Swap the current and the smallest
+			future_moves.set(smallest, future_moves.get(i));
+			future_moves.set(i, curr_smallest);
+		}
 	}
 	
 	//Draw the empty square
@@ -193,49 +241,6 @@ class Knights_square {
 	
 	public int get_y_loc() {
 		return y_index;
-	}
-	
-	public void add_to_future_moves(int id, int total_moves) {
-		ArrayList<Integer> temp_move = new ArrayList<>();
-		temp_move.add(id);
-		temp_move.add(total_moves);
-		future_moves.add(temp_move);
-	}
-	
-	public boolean more_moves() {
-		if (future_moves.size() > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	public int get_next(boolean optimized) {
-		int id = future_moves.get(0).get(0);
-		future_moves.remove(0);
-		return id;
-		
-	}
-	
-	public void order_moves() {
-		for (int i = 0; i < future_moves.size(); i += 1) {
-			ArrayList<Integer> curr_smallest = future_moves.get(i);
-			int smallest = i;
-			
-			for (int j = i; j < future_moves.size(); j += 1) {
-				ArrayList<Integer> curr_checking = future_moves.get(j);
-				
-				if (curr_checking.get(1) < curr_smallest.get(1)) {
-					curr_smallest = curr_checking;
-					smallest = j;
-				}
-				
-			}
-			
-			//Swap the current and the smallest
-			future_moves.set(smallest, future_moves.get(i));
-			future_moves.set(i, curr_smallest);
-		}
 	}
 	 
 }

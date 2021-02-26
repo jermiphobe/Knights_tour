@@ -58,10 +58,12 @@ class Knights_frame extends JFrame {
 		setResizable(true);
 		setLocation(400, 15);
 		
+		//Set layout and add panels
 		setLayout(new BorderLayout());
 		add_menu();
 		add_board();
 		
+		//Initialize the starting point -> Want to add this to its own function
 		generate_legal_moves();
 		initialize_start();
 		
@@ -69,6 +71,7 @@ class Knights_frame extends JFrame {
 
 	}
 	
+	//Creates a panel for the menu and adds it to the frame
 	public void add_menu() {
 		menu = new JPanel();
 		menu.setPreferredSize(new Dimension(menu_width, height));
@@ -78,18 +81,20 @@ class Knights_frame extends JFrame {
 		add(menu, BorderLayout.WEST);
 	}
 	
+	//Creates the grid array and then creates the board panel and adds it to the frame
 	public void add_board() {
 		create_squares();
 		
-		board = new Knights_canvas(height);
+		//Board panel creation
+		board = new Knights_canvas();
 		board.setPreferredSize(new Dimension(height, height));
 		board.create_squares(squares);
 		
 		add(board, BorderLayout.CENTER);
 	}
 	
+	//Adds buttons/functionality to the menu
 	public void add_buttons() {
-		//Adds buttons/functionality to the menu
 		RoundedButton start_btn = new RoundedButton("Simulate");
 		start_btn.setBackground(new Color(145, 163, 176));
 		
@@ -97,7 +102,9 @@ class Knights_frame extends JFrame {
 		start_btn.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)
 		    {
+		    	//If the board is not solved, run the simulation -> Need to change this around once the initialize function is finished
 		    	if (solved) {
+		    		//Change this to it's own function like in the constructor
 		    		solved = false;
 		    		squares = new ArrayList<>();
 		    		path = new ArrayList<>();
@@ -114,6 +121,7 @@ class Knights_frame extends JFrame {
 		menu.add(start_btn);
 	}
 	
+	//Creates the timer and the timer task for the main loop
 	public void start_knights_tour() {
 		//Creates and runs the timer
 		timer = new Timer();
@@ -131,7 +139,8 @@ class Knights_frame extends JFrame {
 	        		if (opt) {
 	        			current_stop.order_moves();
 	        		}
-	        	
+	        		
+	        		//Fill the current square
 	        		board.fill_a_square(current_stop.get_id());
 	        		
 	        	}
@@ -146,6 +155,7 @@ class Knights_frame extends JFrame {
 	        				Knights_square temp = squares.get(i).get(j);
 	        				if (temp.get_id() == next_id) {
 	        					
+	        					//Add the current stop's first available move to the path
 	        					path.add(temp);
 	        				}
 	        			}
@@ -166,7 +176,6 @@ class Knights_frame extends JFrame {
 	        	
 	        	//Check for solved -> if solved cancel the timer and start the timer to draw in the solution
 	        	if (path.size() == total_boxes) {  //If the path is the same size as the total amount of squares, then it's solved
-	        		System.out.println("Solved");
 	        		solved = true;
 	        		
 	        		//Fill in the last square with the working color
@@ -284,7 +293,8 @@ class Knights_frame extends JFrame {
 			//Reset curr_x
 				curr_x = 0;
 			}
-}
+		
+	}
 	
 	//A list of legal moves you can make 
 	public void generate_legal_moves() {
