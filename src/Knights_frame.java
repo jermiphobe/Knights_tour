@@ -35,7 +35,7 @@ class Knights_frame extends JFrame {
 	int watch_wait = 90;
 	
 	//Optimized or not 
-	boolean opt = true;
+	boolean opt = false;
 	
 	//Solved or not
 	boolean solved = false;
