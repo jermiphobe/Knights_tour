@@ -89,6 +89,7 @@ class Knights_square {
 			future_moves.set(smallest, future_moves.get(i));
 			future_moves.set(i, curr_smallest);
 		}
+		
 	}
 	
 	//Draw the empty square
@@ -185,6 +186,10 @@ class Knights_square {
 		start = true;
 	}
 	
+	public void unset_start() {
+		start = false;
+	}
+	
 	public void set_as_end() {
 		end = true;
 	}
@@ -241,6 +246,23 @@ class Knights_square {
 	
 	public int get_y_loc() {
 		return y_index;
+	}
+	
+	public int get_x_origin() {
+		return x_origin;
+	}
+	
+	public int get_y_origin() {
+		return y_origin;
+	}
+	
+	//For debugging purposes
+	public void print_moves() {
+		System.out.println("Current square: " + id);
+		
+		for (ArrayList<Integer> move: future_moves) {
+			System.out.println("\t" + "Option: " + move.get(0) + " Possible moves: " + move.get(1));
+		}
 	}
 	 
 }

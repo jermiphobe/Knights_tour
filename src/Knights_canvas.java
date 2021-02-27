@@ -7,8 +7,11 @@ import javax.swing.JPanel;
 class Knights_canvas extends JPanel {
 	
 	static ArrayList<ArrayList<Knights_square>> squares;
+	int height = 0;
 	
-	Knights_canvas() {}
+	Knights_canvas(int height) {
+		this.height = height;
+	}
 	
 	//Sets the squares list to the list created in the frame
 	public void create_squares(ArrayList<ArrayList<Knights_square>> boxes) {
@@ -18,30 +21,16 @@ class Knights_canvas extends JPanel {
 	}
 	
 	//Sets a square to filled once it's been visited
-	public void fill_a_square(int id) {
-		for (ArrayList<Knights_square> squares: squares) {
-			for (Knights_square square: squares) {
-				if (square.get_id() == id) {
-					square.fill();
-					break;
-				}
-			}
-		}
+	public void fill_a_square(Knights_square square) {
+		square.fill();
 		
 		repaint();
 		
 	}
 	
 	//Sets a square to unfilled - in case of backtracking
-	public void unfill_a_square(int id) {
-		for (ArrayList<Knights_square> squares: squares) {
-			for (Knights_square square: squares) {
-				if (square.get_id() == id) {
-					square.unfill();
-					break;
-				}
-			}
-		}
+	public void unfill_a_square(Knights_square square) {
+		square.unfill();
 		
 		repaint();
 	}
@@ -59,31 +48,21 @@ class Knights_canvas extends JPanel {
 	}
 	
 	//Set a square as the start of the solution - then color it light gold
-	public void start(int id) {
-		//Sets the starting square on the board
-		for (ArrayList<Knights_square> squares: squares) {
-			for (Knights_square square: squares) {
-				if (square.get_id() == id) {
-					square.set_as_start();
-					break;
-				}
-			}
-		}
+	public void start(Knights_square square) {
+		square.set_as_start();
 		
 		repaint();
 	}
 	
+	public void unset_start(Knights_square square) {
+		square.unset_start();
+		repaint();
+	}
+	
 	//Set a square as the end of the solution - then color it dark gold
-	public void end(int id) {
+	public void end(Knights_square square) {
 		//Sets the starting square on the board
-		for (ArrayList<Knights_square> squares: squares) {
-			for (Knights_square square: squares) {
-				if (square.get_id() == id) {
-					square.set_as_end();
-					break;
-				}
-			}
-		}
+		square.set_as_end();
 		
 		repaint();
 	}
@@ -100,14 +79,15 @@ class Knights_canvas extends JPanel {
 	
 	//Set the whole canvas as white so we can draw a new board, then draw the board
 	public void reset_canvas() {
-		
+		repaint();
 	}
 	
 	//Order to draw the squares
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		setBackground(new Color(242, 243, 244));
+		;g.setColor(new Color(242, 243, 244));
+		g.fillRect(0,  0, height, height);
 		
 		for (ArrayList<Knights_square> squares: squares) {
 			for (Knights_square square: squares) {
