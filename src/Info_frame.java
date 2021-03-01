@@ -67,6 +67,7 @@ public class Info_frame extends JFrame{
 		main_label.setText("Important Notes");
 		main_label.setHorizontalAlignment(JLabel.CENTER);
 		main_label.setPreferredSize(new Dimension(0, 100));
+		main_label.setBackground(new Color(242, 243, 244));
 		
 		//Reads in the file and adds the text to the text field
 		File file = new File("Knights_tour_info.txt");

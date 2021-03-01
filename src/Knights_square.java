@@ -2,9 +2,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.TreeMap;
 
 class Knights_square {
 	int x_origin = 0;
