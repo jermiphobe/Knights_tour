@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,20 +10,31 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 class Knights_frame extends JFrame {
 	JPanel menu;
 	JPanel main;
-	static Knights_canvas board;
+	Knights_canvas board;
+	Info_frame rules;
+	
+	//Main icon
+	ImageIcon image = new ImageIcon("knight_2.png");
 	
 	//Size variables
 	int menu_width = 300;
-	int total_boxes = 180;
+	int total_boxes = 64;
 	
 	//Figure out side length and box size
-	int side_length = (int) Math.sqrt(total_boxes);
+	int side_length;
 	int height;
 	int square_size;
 	
@@ -34,7 +46,7 @@ class Knights_frame extends JFrame {
 	//Starting Point
 	int start = 37;
 	
-	//Watch it get solved or not
+	//Wait time for timer
 	int watch_wait = 90;
 	
 	//Optimized or not 
@@ -43,6 +55,8 @@ class Knights_frame extends JFrame {
 	//Solved or not / cleared or not
 	boolean solved = false;
 	boolean cleared = true;
+	boolean active = false;
+	boolean paused = true;
 	
 	//Timer and timer task for doing one iteration of the solution process
     Timer timer;
@@ -69,9 +83,14 @@ class Knights_frame extends JFrame {
     				if (mouse_x >= x_origin && mouse_x <= x_origin + square_size) {
     					//Check if the mouse is between the top and bottom of the square
     					if (mouse_y >= y_origin && mouse_y <= y_origin + square_size) {
-    						//Remove old start
-    						board.unset_start(path.get(0));
-    						path.remove(0);
+    						
+    						try {
+	    						//Remove old start
+	    						board.unset_start(path.get(0));
+	    						path.remove(0);
+    						} catch (Exception e1) {
+    							
+    						}
     						
     						//Set start variable as the new square id and re-initialize the start
     						start = square.get_id();
@@ -92,6 +111,32 @@ class Knights_frame extends JFrame {
 		}
     	
     };
+    
+    //A button to play/pause the simulation
+    	//It's up here so I can reset the text with the simulate/clear buttons
+    RoundedButton pause_button;
+    
+    //The size slider
+    JSlider size_slider;
+    JLabel size_label;
+    
+    //Change listener for the size slider
+    ChangeListener change_size;
+    
+    //The speed slider
+    JSlider speed_slider;
+    
+    //The listener for the speed slider
+    ChangeListener change_speed;
+    
+    //The optimization check box
+    JCheckBox opt_box;
+    ImageIcon opt_on = new ImageIcon("On_switch_final.png");
+    ImageIcon opt_off = new ImageIcon("Off_switch_final.png");
+    
+    //The action listener for the optimized check box
+    ActionListener change_opt;
+    
 	
 	Knights_frame() {
 		
@@ -104,6 +149,7 @@ class Knights_frame extends JFrame {
 		setSize(height + menu_width + 17, height + 40);
 		setResizable(true);
 		setLocation(400, 15);
+		setIconImage(image.getImage());
 		
 		//Set layout and add panels
 		setLayout(new BorderLayout());
@@ -115,8 +161,12 @@ class Knights_frame extends JFrame {
 		
 		//Add the action listener to select starting point
 		board.addMouseListener(move_start);
+		size_slider.addChangeListener(change_size);
+		speed_slider.addChangeListener(change_speed);
 		
 		setVisible(true);
+		
+		rules = new Info_frame(height);
 
 	}
 	
@@ -126,12 +176,11 @@ class Knights_frame extends JFrame {
 		double screen_height = screenSize.getHeight();
 		
 		//Calculate frame size
-		int frame_height = (int) (screen_height * .85);
+		height = (int) (screen_height * .85);
 		
 		//Reset total_boxes and total_window_size to be accurate to what is shown on screen 
-		square_size = frame_height / side_length;
-		total_boxes = side_length * side_length;
-		height = side_length * square_size;
+		side_length = (int) Math.sqrt(total_boxes);
+		square_size = height / side_length;
 	}
 	
 	//Creates a panel for the menu and adds it to the frame
@@ -187,47 +236,242 @@ class Knights_frame extends JFrame {
 	
 	//Adds buttons/functionality to the menu
 	public void add_buttons() {
+		//Simulate button -> Will start/restart the simulation
 		RoundedButton start_btn = new RoundedButton("Simulate");
 		start_btn.setBackground(new Color(145, 163, 176));
 		
-		//Adds function to the play/pause button
+		//Adds function to the simulate button
 		start_btn.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	//Remove the mouse listener so you can't change the start during the simulation
-		    	board.removeMouseListener(move_start);
 		    	
-		    	//If the board is not solved, run the simulation
-		    	if (solved) {
-		    		reset();
-		    		start_knights_tour();
-		    	} else {
-		    		start_knights_tour();
+		    	//Check that starting point is on the board
+		    	if (start <= total_boxes) {
+		    		//Remove the mouse listener so you can't change the start during the simulation
+			    	board.removeMouseListener(move_start);
+			    	
+			    	//Remove the size slider listener so the board can't change
+			    	size_slider.removeChangeListener(change_size);
 		    		
+			    	//Check to see if a simulation is active
+			    	if (active) {
+			    		
+			    		//Check if paused or not
+			    		if (paused) {
+			    			paused = false;
+			    			pause_button.setLabel("Pause");
+			    			
+			    			reset();
+			    			start_knights_tour();
+			    			
+			    		} else {
+				    		//Stop the timer, clear the board, and restart the simulation
+				    		timer.cancel();
+				    		reset();
+				    		start_knights_tour();
+			    		}
+			    		
+			    	} else {
+			    		//Set active to true
+				    	active = true;
+				    	paused = false;
+				    	pause_button.setLabel("Pause");
+			    		
+				    	//If the board is not solved, run the simulation
+				    	if (solved) {
+				    		reset();
+				    		start_knights_tour();
+				    	} else {
+				    		start_knights_tour();
+				    		
+				    	}
+			    	}
 		    	}
-		    	
+			    	
 		    	
 		    }
 		});
 		
 		main.add(start_btn);
 		
-		//Add a clear button
+		//Add a clear button -> Will clear a solve board or cancel a simulation
 		RoundedButton clear = new RoundedButton("Clear");
 		clear.setBackground(new Color(145, 163, 176));
 		
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				board.addMouseListener(move_start);
-				
-				cleared = true;
-				reset();
+				if (active || solved) {
+					board.addMouseListener(move_start);
+					size_slider.addChangeListener(change_size);
+					timer.cancel();
+					
+					cleared = true;
+					reset();
+					
+					//Set the pause button up to restart the simulation
+	    			active = false;
+	    			pause_button.setLabel("Play");
+				}
 				
 			}
 		});
 		
 		main.add(clear);
+		
+		//A button to pause the simulation
+		pause_button = new RoundedButton("Play");
+		pause_button.setBackground(new Color(145, 163, 176));
+		
+		pause_button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				//Only do anything if the simulation isn't solved
+				if (!solved && active) {
+					
+					//Decide what to do based on if the simulation is active or not
+					if (paused) {
+						paused = false;
+						pause_button.setLabel("Pause");
+						start_knights_tour();
+					} else {
+						paused = true;
+						pause_button.setLabel("Play");
+						timer.cancel();
+					}
+				}
+			}
+		});
+		
+		//Add the pause button
+		main.add(pause_button);
+		
+		//Create a check box for selecting if the simulation is optimized or not
+		JPanel opt_panel = new JPanel();
+		JLabel opt_label = new JLabel("Optimize the Simulation");
+		opt_panel.setBackground(new Color(145, 163, 176));
+		opt_panel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		opt_box = new JCheckBox();
+		opt_box.setHorizontalAlignment(JCheckBox.CENTER);
+		opt_box.setBackground(new Color(145, 163, 176));
+		opt_box.setIcon(opt_off);
+		opt_box.setSelectedIcon(opt_on);
+		opt_box.setSelected(true);
+		opt_box.setFocusable(false);
+		
+		opt_label.setHorizontalAlignment(JLabel.CENTER);
+		
+		opt_panel.add(opt_label);
+		opt_panel.add(opt_box);
+		
+		//Initialize the action listener for the check box
+		change_opt = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (opt_box.isSelected()) {
+					opt = true;
+				} else {
+					opt = false;
+				}
+			}
+		};
+		
+		opt_box.addActionListener(change_opt);
+		
+		main.add(opt_panel);
+		
+		//Create the slider to change the size -> Will only work when the board is cleared
+		size_slider = new JSlider(3, 28, 8);
+		JLabel slider_label = new JLabel("Select Side Length");
+		size_label = new JLabel();
+		
+		//The panel to hold them both
+		JPanel slider_panel = new JPanel();
+		slider_panel.setBackground(new Color(145, 163, 176));
+		slider_panel.setLayout(new GridLayout(0, 1, 0, 0));
+		size_slider.setBackground(new Color(145, 163, 176));
+		
+		size_slider.setPaintTrack(true);
+		size_slider.setMajorTickSpacing(5);
+		size_slider.setPaintLabels(true);
+		
+		slider_label.setHorizontalAlignment(JLabel.CENTER);
+		size_label.setText(size_slider.getValue() + " X " + size_slider.getValue());
+		size_label.setHorizontalAlignment(JLabel.CENTER);
+		
+		slider_panel.add(slider_label);
+		slider_panel.add(size_slider);
+		slider_panel.add(size_label);
+		
+		//Initialize the change size change listener
+		change_size = new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				//Get the value of the slider
+				int side_length = size_slider.getValue();
+				total_boxes = side_length * side_length;
+
+				size_label.setText(size_slider.getValue() + " X " + size_slider.getValue());
+				
+				set_sizes();
+				reset();
+				
+			}
+	    	
+	    };
+		
+		main.add(slider_panel);
+		
+		//Create a slider to control the simulation speed
+		speed_slider = new JSlider(10, 130, 90);
+		JLabel speed_label = new JLabel("Select Simulation Speed");
+		
+		//The panel to hold them both
+		JPanel speed_panel = new JPanel();
+		speed_panel.setBackground(new Color(145, 163, 176));
+		speed_panel.setLayout(new GridLayout(0, 1, 0, 0));
+		speed_slider.setBackground(new Color(145, 163, 176));
+		
+		speed_slider.setPaintTrack(true);
+		speed_slider.setMajorTickSpacing(20);
+		speed_slider.setPaintLabels(true);
+		
+		speed_label.setHorizontalAlignment(JLabel.CENTER);
+		
+		speed_panel.add(speed_label);
+		speed_panel.add(speed_slider);
+		
+		//Initializes the change speed change listener
+		change_speed = new ChangeListener() {
+	    	
+	    	@Override 
+	    	public void stateChanged(ChangeEvent e) {
+	    		watch_wait = speed_slider.getValue();
+	    	}
+	    };
+		
+		main.add(speed_panel);
+		
+		//A button to close the simulation because the x on the frame isn't enough
+		RoundedButton exit = new RoundedButton("Exit Program");
+		exit.setBackground(new Color(145, 163, 176));
+		
+		exit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				rules.dispose();
+				
+			}
+			
+		});
+		
+		main.add(exit);
+		
 	}
 	
 	//Creates the timer and the timer task for the main loop
@@ -275,6 +519,10 @@ class Knights_frame extends JFrame {
 	        		if (path.size() == 1) {
 	        			board.fail();
 	        			timer.cancel();
+	        			
+	        			//Set the pause button up to restart the simulation
+	        			active = false;
+	        			pause_button.setLabel("Play");
 	        		}
 	        		
 	        		//If no more moves, remove this square from the path list
@@ -292,6 +540,10 @@ class Knights_frame extends JFrame {
 	        		board.end(last_square);
 	        		board.solve_it_at_once();
 	        		timer.cancel();
+	        		
+	        		//Set the pause button up to restart the simulation
+        			active = false;
+        			pause_button.setLabel("Play");
 	        			        		
 	        	}
 		        	
@@ -299,7 +551,7 @@ class Knights_frame extends JFrame {
 	        
 	    }; 
 	    
-		timer.schedule(simulate, 10, watch_wait);
+		timer.schedule(simulate, 0, watch_wait);
 
 	}
 	

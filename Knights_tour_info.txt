@@ -1,0 +1,11 @@
+The Simulate button will start or reset the simulation
+
+The Play/Pause button will only work if a simulation is under way
+	
+The Select Side Length slider will only work if the board is cleared
+	
+The Simulation Speed Slider will take effect when you resume a paused simulation or start a new one
+	
+To select a new starting point, just click a square when the board is cleared
+	
+If the starting point is too big for the board and disappears when down sizing, you'll need to select a new starting point or the simulation won't start
