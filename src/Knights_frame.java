@@ -9,12 +9,15 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -26,6 +29,10 @@ class Knights_frame extends JFrame {
 	
 	//Main icon
 	ImageIcon image = new ImageIcon("knight_2.png");
+	
+	Color background = new Color(242, 243, 244);
+	Color button_color = new Color(145, 163, 176);
+	Border black_border = BorderFactory.createLineBorder(Color.black);
 	
 	//Size variables
 	int menu_width = 300;
@@ -191,22 +198,22 @@ class Knights_frame extends JFrame {
 		menu.setLayout(new BorderLayout());
 		
 		JPanel border_north = new JPanel();
-		border_north.setBackground(new Color(242, 243, 244));
+		border_north.setBackground(background);
 		border_north.setPreferredSize(new Dimension(10, 10));
 		menu.add(border_north, BorderLayout.NORTH);
 		
 		JPanel border_east = new JPanel();
-		border_east.setBackground(new Color(242, 243, 244));
+		border_east.setBackground(background);
 		border_east.setPreferredSize(new Dimension(10, 10));
 		menu.add(border_east, BorderLayout.EAST);
 		
 		JPanel border_south = new JPanel();
-		border_south.setBackground(new Color(242, 243, 244));
+		border_south.setBackground(background);
 		border_south.setPreferredSize(new Dimension(10, 10));
 		menu.add(border_south, BorderLayout.SOUTH);
 		
 		JPanel border_west = new JPanel();
-		border_west.setBackground(new Color(242, 243, 244));
+		border_west.setBackground(background);
 		border_west.setPreferredSize(new Dimension(10, 10));
 		menu.add(border_west, BorderLayout.WEST);
 		
@@ -236,7 +243,7 @@ class Knights_frame extends JFrame {
 	public void add_buttons() {
 		//Simulate button -> Will start/restart the simulation
 		RoundedButton start_btn = new RoundedButton("Simulate");
-		start_btn.setBackground(new Color(145, 163, 176));
+		start_btn.setBackground(button_color);
 		
 		//Adds function to the simulate button
 		start_btn.addActionListener(new ActionListener() {
@@ -294,7 +301,7 @@ class Knights_frame extends JFrame {
 		
 		//Add a clear button -> Will clear a solve board or cancel a simulation
 		RoundedButton clear = new RoundedButton("Clear");
-		clear.setBackground(new Color(145, 163, 176));
+		clear.setBackground(button_color);
 		
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -319,7 +326,7 @@ class Knights_frame extends JFrame {
 		
 		//A button to pause the simulation
 		pause_button = new RoundedButton("Play");
-		pause_button.setBackground(new Color(145, 163, 176));
+		pause_button.setBackground(button_color);
 		
 		pause_button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -347,12 +354,13 @@ class Knights_frame extends JFrame {
 		//Create a check box for selecting if the simulation is optimized or not
 		JPanel opt_panel = new JPanel();
 		JLabel opt_label = new JLabel("Optimize the Simulation");
-		opt_panel.setBackground(new Color(145, 163, 176));
+		opt_panel.setBackground(button_color);
 		opt_panel.setLayout(new GridLayout(0, 1, 0, 0));
+		opt_panel.setBorder(black_border);
 		
 		opt_box = new JCheckBox();
 		opt_box.setHorizontalAlignment(JCheckBox.CENTER);
-		opt_box.setBackground(new Color(145, 163, 176));
+		opt_box.setBackground(button_color);
 		opt_box.setIcon(opt_off);
 		opt_box.setSelectedIcon(opt_on);
 		opt_box.setSelected(true);
@@ -387,9 +395,10 @@ class Knights_frame extends JFrame {
 		
 		//The panel to hold them both
 		JPanel slider_panel = new JPanel();
-		slider_panel.setBackground(new Color(145, 163, 176));
+		slider_panel.setBackground(button_color);
 		slider_panel.setLayout(new GridLayout(0, 1, 0, 0));
-		size_slider.setBackground(new Color(145, 163, 176));
+		slider_panel.setBorder(black_border);
+		size_slider.setBackground(button_color);
 		
 		size_slider.setPaintTrack(true);
 		size_slider.setMajorTickSpacing(5);
@@ -429,9 +438,10 @@ class Knights_frame extends JFrame {
 		
 		//The panel to hold them both
 		JPanel speed_panel = new JPanel();
-		speed_panel.setBackground(new Color(145, 163, 176));
+		speed_panel.setBackground(button_color);
 		speed_panel.setLayout(new GridLayout(0, 1, 0, 0));
-		speed_slider.setBackground(new Color(145, 163, 176));
+		speed_panel.setBorder(black_border);
+		speed_slider.setBackground(button_color);
 		
 		speed_slider.setPaintTrack(true);
 		speed_slider.setMajorTickSpacing(20);
@@ -455,7 +465,7 @@ class Knights_frame extends JFrame {
 		
 		//A button to close the simulation because the x on the frame isn't enough
 		RoundedButton exit = new RoundedButton("Exit Program");
-		exit.setBackground(new Color(145, 163, 176));
+		exit.setBackground(button_color);
 		
 		exit.addActionListener(new ActionListener() {
 

@@ -28,6 +28,9 @@ public class Info_frame extends JFrame{
 	Font text_font = new Font("Consolas", Font.PLAIN, 16);
 	Font label_font = new Font("Consolas", Font.BOLD, 35);
 	
+
+	Color background = new Color(242, 243, 244);
+	
 	Info_frame(int height) {
 
 		setLocation(900, 125);
@@ -37,22 +40,22 @@ public class Info_frame extends JFrame{
 		
 		//Add space around the edges and the main center panel that the info will go in
 		JPanel border_north = new JPanel();
-		border_north.setBackground(new Color(242, 243, 244));
+		border_north.setBackground(background);
 		border_north.setPreferredSize(new Dimension(20, 20));
 		add(border_north, BorderLayout.NORTH);
 		
 		JPanel border_east = new JPanel();
-		border_east.setBackground(new Color(242, 243, 244));
+		border_east.setBackground(background);
 		border_east.setPreferredSize(new Dimension(20, 20));
 		add(border_east, BorderLayout.EAST);
 		
 		JPanel border_south = new JPanel();
-		border_south.setBackground(new Color(242, 243, 244));
+		border_south.setBackground(background);
 		border_south.setPreferredSize(new Dimension(20, 20));
 		add(border_south, BorderLayout.SOUTH);
 		
 		JPanel border_west = new JPanel();
-		border_west.setBackground(new Color(242, 243, 244));
+		border_west.setBackground(background);
 		border_west.setPreferredSize(new Dimension(20, 20));
 		add(border_west, BorderLayout.WEST);
 		
@@ -67,7 +70,7 @@ public class Info_frame extends JFrame{
 		main_label.setText("Important Notes");
 		main_label.setHorizontalAlignment(JLabel.CENTER);
 		main_label.setPreferredSize(new Dimension(0, 100));
-		main_label.setBackground(new Color(242, 243, 244));
+		main_label.setBackground(background);
 		
 		//Reads in the file and adds the text to the text field
 		File file = new File("Knights_tour_info.txt");
